@@ -10,12 +10,11 @@ from flask import (
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "cari_web.db")
 
-# Giriş bilgileri (İstediğin gibi değiştir)
 KULLANICI_ADI = "admin"
 SIFRE = "1234"
 
 app = Flask(__name__)
-app.secret_key = "cari-web-panel-anahtari-2026"
+app.secret_key = os.environ.get("SECRET_KEY", "cari-web-panel-anahtari-2026")
 
 TR_ORDER = "0123456789abcçdefgğhıijklmnoöpqrsştuüvwxyz"
 TR_DICT = {ch: i for i, ch in enumerate(TR_ORDER)}
@@ -124,6 +123,10 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+
+
+# Gunicorn ile başlatıldığında da tabloların kesin oluşması için modül düzeyinde çağrılır
+init_db()
 
 
 def get_cari_bakiye(conn, cari_id):
@@ -826,5 +829,4 @@ def urun_dokumu():
 
 
 if __name__ == "__main__":
-    init_db()
     app.run(host="0.0.0.0", port=5000, debug=True)
